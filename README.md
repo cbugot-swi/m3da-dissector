@@ -12,6 +12,6 @@ Once compiled you can run it by running:
 > wireshark -X lua_script:m3da-dissector/dissector.lua m3da-dissector/test1.pcapng
 
 
-It's licensed under the term of the Eclipse Public License - v 1.0. See the LICENSE-EPLv1.0.html at the root of the repository.
+It's licensed under the term of the Eclipse Public License - v 1.0. See the LICENSE file at the root of the repository.
 
 The binary deserializer and a couple of Lua utilities where extraced from the Mihini project: http://www.eclipse.org/mihini
