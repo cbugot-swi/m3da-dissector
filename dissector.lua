@@ -35,13 +35,13 @@ local function parse_message(tvb, tree, data, metrics)
     tree:add(f_path, tvb(metrics.path.offset, metrics.path.length), data.path)
     tree:add(f_ticketid, tvb(metrics.ticketid.offset, metrics.ticketid.length), data.ticketid)
     for k, v in pairs(data.body) do
-        local t
         if type(v) == 'table' then
+            local t
             if not v.__class then
                 t = "LIST"
             else
                 if v.__class == "QuasiPeriodicVector" then
-                    t = "QPV"
+                    t = string.format("QPV start=%f, n=%d", v.start, #v.shifts)
                     local Y = {v.start}
                     local i = 2
                     while #v.shifts > 1 do
@@ -54,8 +54,8 @@ local function parse_message(tvb, tree, data, metrics)
                     for j=i, i+n-1 do Y[j] = Y[j-1] + v.period end
                     v = Y
                     
-                elseif v.__class == "DeltaVector" then
-                    t = "DV"
+                elseif v.__class == "DeltasVector" then
+                    t = string.format("DV start=%f, factor=%f", v.start, v.factor)
                     local Y = {v.factor * v.start}
                     for i, d in ipairs(v.deltas) do Y[i+1] = Y[i] + v.factor * d end
                     v = Y
@@ -65,8 +65,15 @@ local function parse_message(tvb, tree, data, metrics)
 
             if #v > 1 then v = "{ "..table.concat(v, ", ").." }"
             else v = v[1] end
+
+            --display the value list
+            tree:add(tvb(metrics.body[k].offset, metrics.body[k].length), string.format("%s (%s): %s", tostring(k), t, tostring(v)))
+
+        else
+            -- the value is a simple value
+            tree:add(tvb(metrics.body[k].offset, metrics.body[k].length), string.format("%s (VALUE): %s", tostring(k), tostring(v)))
         end
-        tree:add(tvb(metrics.body[k].offset, metrics.body[k].length), string.format("(%s) %s = %s", t, tostring(k), tostring(v)))
+        
     end
     
 end
