@@ -41,17 +41,17 @@ local function parse_message(tvb, tree, data, metrics)
                 t = "LIST"
             else
                 if v.__class == "QuasiPeriodicVector" then
-                    t = string.format("QPV start=%f, n=%d", v.start, #v.shifts)
+                    t = string.format("QPV start=%f, period=%f, n=%d", v.start, v.period, #v.shifts)
                     local Y = {v.start}
-                    local i = 2
+                    local i = 1
                     while #v.shifts > 1 do
                         local n, s = table.remove(v.shifts), table.remove(v.shifts)
-                        for j=i, i+n do Y[j] = Y[j-1] + v.period end
-                        i = i+n
-                        Y[i] = Y[i]+s
+                        for j=i+1, i+n do Y[j] = Y[j-1] + v.period end
+                        i = i+n+1
+                        Y[i] = Y[i-1]+s
                     end
                     local n = table.remove(v.shifts)
-                    for j=i, i+n-1 do Y[j] = Y[j-1] + v.period end
+                    for j=i+1, i+n do Y[j] = Y[j-1] + v.period end
                     v = Y
                     
                 elseif v.__class == "DeltasVector" then
