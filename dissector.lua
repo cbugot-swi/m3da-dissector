@@ -63,8 +63,9 @@ local function parse_message(tvb, tree, data, metrics)
                 else v = {"Error: unknown object type!"} end
             end
 
-            if #v > 1 then v = "{ "..table.concat(v, ", ").." }"
-            else v = v[1] end
+
+            for i, val in ipairs(v) do if val==niltoken then v[i]="NULL" end end
+            v = "{ "..table.concat(v, ", ").." }"
 
             --display the value list
             tree:add(tvb(metrics.body[k].offset, metrics.body[k].length), string.format("%s (%s): %s", tostring(k), t, tostring(v)))
